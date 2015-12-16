@@ -54,7 +54,7 @@ public class MapsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
-        runnable.run();
+//        runnable.run();
         if (!isLoged)
         {
             TextView mytv= (TextView) findViewById(R.id.tvbar);
@@ -158,7 +158,7 @@ public class MapsActivity extends ActionBarActivity {
 
 
 
-    Runnable runnable = new Runnable() {
+    /*Runnable runnable = new Runnable() {
         final Handler handler = new Handler();
 
         @Override
@@ -193,7 +193,7 @@ public class MapsActivity extends ActionBarActivity {
             }
         }
 
-    };
+    };*/
 //    handler.postDelayed(runnable, 1000);
 
 

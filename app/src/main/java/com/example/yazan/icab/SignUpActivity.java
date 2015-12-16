@@ -131,6 +131,7 @@ public class SignUpActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(String arg0) {
                     // TODO Auto-generated method stub
+                    signSuccess();
 
                 }
             }, new Response.ErrorListener() {
@@ -138,6 +139,7 @@ public class SignUpActivity extends AppCompatActivity {
                 @Override
                 public void onErrorResponse(VolleyError arg0) {
                     // TODO Auto-generated method stub
+                    Toast.makeText(getBaseContext(),"something went wrong, please try again",Toast.LENGTH_LONG).show();
 
                 }
             }) {
@@ -226,6 +228,28 @@ public class SignUpActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void signSuccess(){
+        Toast.makeText(this,"account created successfully, you can login now",Toast.LENGTH_LONG).show();
+
+        final EditText BD = (EditText) findViewById(R.id.datesignupet);
+        BD.setInputType(InputType.TYPE_NULL);
+
+        final EditText user = (EditText) findViewById(R.id.usersignupet);
+        final EditText pass = (EditText) findViewById(R.id.passsignupet);
+        EditText conpass = (EditText) findViewById(R.id.passconfirmsignupet);
+        final EditText email = (EditText) findViewById(R.id.emailsignupet);
+        final EditText phone = (EditText) findViewById(R.id.phonesignupet);
+
+        user.getText().clear();
+        pass.getText().clear();
+        conpass.getText().clear();
+        email.getText().clear();
+        phone.getText().clear();
+        BD.getText().clear();
+
+
     }
 
 
