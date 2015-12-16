@@ -1,8 +1,10 @@
 package com.example.yazan.icab;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -44,9 +46,7 @@ public class MapsActivity extends ActionBarActivity {
     boolean isLoged=false;
     boolean isNet=false;
 
-    RequestQueue rq;
-    String insertUrl="http://192.168.233.1/grad.website/insert_user.php";
-    String showUrl="http://192.168.233.1/grad.website/show_users.php";
+    String showCarUrl="http://www.gradwebsite-domain.usa.cc/show_cars.php";
 
 
     @Override
@@ -84,26 +84,9 @@ public class MapsActivity extends ActionBarActivity {
             }
         });
 
-        rq = Volley.newRequestQueue(getApplicationContext());
 
     }
 
-//    private class checknet extends AsyncTask<String, Void, String> {
-//
-//        @Override
-//        protected String doInBackground(String... params) {
-//            String data=null;
-//            if (hasActiveInternetConnection())data="true";
-//            else data="false";
-//            return data;
-//
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String result) {
-//
-//        }
-//    }
 
     @Override
     protected void onResume() {
@@ -173,13 +156,7 @@ public class MapsActivity extends ActionBarActivity {
     }
 */
 
-    private void updateLabel() {
 
-        String myFormat = "MM/dd/yy"; //In which you need put here
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-        //editText.setText(sdf.format(myCalendar.getTime()));
-
-    }
 
     Runnable runnable = new Runnable() {
         final Handler handler = new Handler();
@@ -243,168 +220,35 @@ public class MapsActivity extends ActionBarActivity {
         {
             final Dialog startDialog=new Dialog(this,R.style.startdialog);
             startDialog.setContentView(R.layout.startdialog);
-            final Dialog loginDialog=new Dialog(this,R.style.startdialog);
-            final Dialog signupDialog=new Dialog(this,R.style.startdialog);
-            loginDialog.setContentView(R.layout.logindialog);
-            signupDialog.setContentView(R.layout.signupdialog);
+//            final Dialog loginDialog=new Dialog(this,R.style.startdialog);
+//            loginDialog.setContentView(R.layout.logindialog);
+//            final Dialog signupDialog=new Dialog(this,R.style.startdialog);
+//            signupDialog.setContentView(R.layout.signupdialog);
 
             startDialog.show();
             Button loginButton= (Button) startDialog.findViewById(R.id.sdlogin);
             Button signupButton= (Button) startDialog.findViewById(R.id.sdsignup);
-            final EditText editText= (EditText) signupDialog.findViewById(R.id.datesignupet);
-            editText.setInputType(InputType.TYPE_NULL);
 
             loginButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    loginDialog.show();
-                    Button doneLogin= (Button) loginDialog.findViewById(R.id.doneloginbtn);
-                    doneLogin.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            EditText user = (EditText) loginDialog.findViewById(R.id.usersigninet);
-                            EditText pass = (EditText) loginDialog.findViewById(R.id.passsigninet);
-                            if (!isOnline())
-                                Toast.makeText(getBaseContext(), "please check your internet connection", Toast.LENGTH_LONG).show();
+//                    loginDialog.show();
+                    Intent intent = new Intent(MapsActivity.this,LoginActivity.class);
+                    startActivity(intent);
 
-                            else if (user.getText().toString().length() == 0) {
-                                Toast.makeText(getBaseContext(), "please enter username", Toast.LENGTH_LONG).show();
-                            } else if (pass.getText().toString().length() == 0) {
-                                Toast.makeText(getBaseContext(), "please enter password", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
                 }
             });
 
             signupButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    signupDialog.show();
-                    Button doneSignup = (Button) signupDialog.findViewById(R.id.donesignupbtn);
-                    doneSignup.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            final EditText user = (EditText) signupDialog.findViewById(R.id.usersignupet);
-                            final EditText pass = (EditText) signupDialog.findViewById(R.id.passsignupet);
-                            EditText conpass = (EditText) signupDialog.findViewById(R.id.passconfirmsignupet);
-                            final EditText email = (EditText) signupDialog.findViewById(R.id.emailsignupet);
-                            final EditText phone = (EditText) signupDialog.findViewById(R.id.phonesignupet);
-                            final EditText BD = (EditText) signupDialog.findViewById(R.id.datesignupet);
-
-                            if (!isOnline())
-                                Toast.makeText(getBaseContext(), "please check your internet connection", Toast.LENGTH_LONG).show();
-
-                            else if (user.getText().toString().length() == 0) {
-                                Toast.makeText(getBaseContext(), "please enter username", Toast.LENGTH_LONG).show();
-                            } else if (pass.getText().toString().length() == 0) {
-                                Toast.makeText(getBaseContext(), "please enter password", Toast.LENGTH_LONG).show();
-                            } else if (conpass.getText().toString().length() == 0) {
-                                Toast.makeText(getBaseContext(), "please enter password confirm", Toast.LENGTH_LONG).show();
-                            } else if (email.getText().toString().length() == 0) {
-                                Toast.makeText(getBaseContext(), "please enter Email", Toast.LENGTH_LONG).show();
-                            }
-                            else if (phone.getText().toString().length() == 0) {
-                                Toast.makeText(getBaseContext(), "please enter Phone number", Toast.LENGTH_LONG).show();
-                            }else if (BD.getText().toString().length() == 0) {
-                                Toast.makeText(getBaseContext(), "please enter Birthday", Toast.LENGTH_LONG).show();
-                            } else if (!pass.getText().toString().equals(conpass.getText().toString())) {
-                                Toast.makeText(getBaseContext(), "entered password must match password confirm", Toast.LENGTH_LONG).show();
-                            }
-
-                            //////
-                            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
-
-                                @Override
-                                public void onResponse(String arg0) {
-                                    // TODO Auto-generated method stub
-
-                                }
-                            }, new Response.ErrorListener() {
-
-                                @Override
-                                public void onErrorResponse(VolleyError arg0) {
-                                    // TODO Auto-generated method stub
-
-                                }
-                            }) {
-
-                                @Override
-                                protected Map<String, String> getParams() throws AuthFailureError {
-                                    // TODO Auto-generated method stub
-                                    Map<String, String> parameters = new HashMap<String, String>();
-
-                                    String phonetype=phone.getText().toString();
-                                    String phonenum=phonetype.substring(0,4)+"-"+phonetype.substring(4,7)+"-"+phonetype.substring(7,10);
-                                    String datefrmat=BD.getText().toString();
-                                    String datenum=datefrmat.substring(6,10)+"-"+datefrmat.substring(3,5)+"-"+datefrmat.substring(0,2);
-
-
-                                    parameters.put("name", user.getText().toString());
-                                    parameters.put("email", email.getText().toString());
-                                    parameters.put("birthday",datenum);
-                                    parameters.put("phone", phonenum);
-                                    parameters.put("pass", pass.getText().toString());
-                                    return parameters;
-                                }
-
-                            };
-
-                            rq.add(request);
-
-                        }
-                        //////
-                }
-
-                );
-            }
-        });
-
-            /////////////
-            final Calendar myCalendar = Calendar.getInstance();
-
-            final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-
-                @Override
-                public void onDateSet(DatePicker view, int year, int monthOfYear,
-                                      int dayOfMonth) {
-                    // TODO Auto-generated method stub
-                    myCalendar.set(Calendar.YEAR, year);
-                    myCalendar.set(Calendar.MONTH, monthOfYear);
-                    myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                    String myFormat = "dd/MM/yyyy"; //In which you need put here
-                    SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-                    EditText editText = (EditText) signupDialog.findViewById(R.id.datesignupet);
-                    editText.setInputType(InputType.TYPE_NULL);
-                    editText.setText(sdf.format(myCalendar.getTime()));
-                }
-
-            };
-        /////////////////////
-        editText.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                new DatePickerDialog(MapsActivity.this, android.R.style.Theme_Holo_Light_Dialog_NoActionBar_MinWidth, date, myCalendar
-                            .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                            myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+//                    signupDialog.show();
+                    Intent intent = new Intent(MapsActivity.this,SignUpActivity.class);
+                    startActivity(intent);
                 }
             });
-            editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 
-                    if (hasFocus) {
 
-                        new DatePickerDialog(MapsActivity.this, android.R.style.Theme_Holo_Light_Dialog_NoActionBar_MinWidth, date, myCalendar
-                                .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                                myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-                    }
-                }
-            });
         }
     }
 
