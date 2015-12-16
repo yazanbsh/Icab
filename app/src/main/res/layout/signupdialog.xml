@@ -90,7 +90,9 @@
         android:layout_below="@+id/emailsignupet"
         android:layout_centerHorizontal="true"
         android:hint="Phone number"
+        android:textColor="@color/primary_text"
         android:textColorHint="@color/primary_text"
+
         />
 
 </RelativeLayout>
