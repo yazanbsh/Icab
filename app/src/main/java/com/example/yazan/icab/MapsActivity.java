@@ -46,6 +46,8 @@ public class MapsActivity extends ActionBarActivity {
     boolean isLoged=false;
     boolean isNet=false;
 
+    Dialog startDialog;
+
     String showCarUrl="http://www.gradwebsite-domain.usa.cc/show_cars.php";
 
 
@@ -54,6 +56,9 @@ public class MapsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+        startDialog=new Dialog(this,R.style.startdialog);
+        startDialog.setContentView(R.layout.startdialog);
+
 //        runnable.run();
         if (!isLoged)
         {
@@ -70,8 +75,10 @@ public class MapsActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 TextView mytv = (TextView) findViewById(R.id.tvbar);
-                mytv.setText("Hello there!");
-                loginmethod();
+                if (!isLoged) {
+                    mytv.setText("Hello there!");
+                    loginmethod();
+                }
 
             }
         });
@@ -218,12 +225,6 @@ public class MapsActivity extends ActionBarActivity {
     {
         if (isLoged==false)
         {
-            final Dialog startDialog=new Dialog(this,R.style.startdialog);
-            startDialog.setContentView(R.layout.startdialog);
-//            final Dialog loginDialog=new Dialog(this,R.style.startdialog);
-//            loginDialog.setContentView(R.layout.logindialog);
-//            final Dialog signupDialog=new Dialog(this,R.style.startdialog);
-//            signupDialog.setContentView(R.layout.signupdialog);
 
             startDialog.show();
             Button loginButton= (Button) startDialog.findViewById(R.id.sdlogin);
@@ -234,7 +235,7 @@ public class MapsActivity extends ActionBarActivity {
                 public void onClick(View v) {
 //                    loginDialog.show();
                     Intent intent = new Intent(MapsActivity.this,LoginActivity.class);
-                    startActivity(intent);
+                    startActivityForResult(intent,1);
 
                 }
             });
@@ -251,6 +252,23 @@ public class MapsActivity extends ActionBarActivity {
 
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                String result=data.getStringExtra("result");
+                isLoged=true;
+                TextView textView=(TextView) findViewById(R.id.tvbar);
+                textView.setText("hello "+result);
+                startDialog.dismiss();
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        }
+    }//onActivityResult
 
     public void settingmethod()
     {
