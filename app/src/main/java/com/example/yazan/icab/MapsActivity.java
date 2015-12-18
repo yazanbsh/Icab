@@ -565,6 +565,7 @@ public class MapsActivity extends ActionBarActivity {
 
                 }
             });
+            rq.add(request);
 
         }
 
