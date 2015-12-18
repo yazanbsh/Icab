@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -107,6 +108,7 @@ public class MapsActivity extends ActionBarActivity {
                     mytv.setText("Hello there!");
                     loginmethod();
                 }
+                else setUserLocation();
 
             }
         });
@@ -389,9 +391,9 @@ public class MapsActivity extends ActionBarActivity {
             final String id = settings.getString("Id", "27");
 
             rq = Volley.newRequestQueue(getApplicationContext());
+            String url=logouturl+"?id="+id;
 
-
-            JsonObjectRequest jOR = new JsonObjectRequest(Request.Method.POST, logouturl,null, new Response.Listener<JSONObject>()
+            JsonObjectRequest jOR = new JsonObjectRequest(Request.Method.GET, url,null, new Response.Listener<JSONObject>()
             {
 
                 @Override
@@ -428,7 +430,7 @@ public class MapsActivity extends ActionBarActivity {
                     Toast.makeText(getBaseContext(),"something went wrong, please try again",Toast.LENGTH_LONG).show();
 
                 }
-            }){
+            })/*{
 
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
@@ -440,7 +442,7 @@ public class MapsActivity extends ActionBarActivity {
                     return parameters;
                 }
 
-            };
+            }*/;
 
             rq.add(jOR);
 
@@ -497,7 +499,13 @@ public class MapsActivity extends ActionBarActivity {
 
 
     public void setUserLocation(){
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, userLocationurl,null, new Response.Listener<JSONObject>() {
+        rq = Volley.newRequestQueue(getApplicationContext());
+
+        String s1=""+userLatLng.latitude;
+        String s2=""+userLatLng.longitude;
+        String s3="27";
+        String url=userLocationurl+"?id="+s3+"&geolat="+s1+"&geolong="+s2;
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,null, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject arg0) {
@@ -519,10 +527,11 @@ public class MapsActivity extends ActionBarActivity {
             @Override
             public void onErrorResponse(VolleyError arg0) {
                 // TODO Auto-generated method stub
-                Toast.makeText(getBaseContext(),"something went wrong, please try again",Toast.LENGTH_LONG).show();
+//                Toast.makeText(getBaseContext(),"something went wrong, please try again",Toast.LENGTH_LONG).show();
+                Log.d("test",arg0.toString());
 
             }
-        }) {
+        })/* {
 
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
@@ -530,7 +539,7 @@ public class MapsActivity extends ActionBarActivity {
                 Map<String, String> parameters = new HashMap<String, String>();
                 String s1=""+userLatLng.latitude;
                 String s2=""+userLatLng.longitude;
-                String s3=id;
+                String s3="27";
 
                 parameters.put("Id",s3);
                 parameters.put("geolat", s1);
@@ -538,7 +547,7 @@ public class MapsActivity extends ActionBarActivity {
                 return parameters;
             }
 
-        };
+        }*/;
 
         rq.add(request);
     }

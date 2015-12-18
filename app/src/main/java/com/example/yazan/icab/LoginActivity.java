@@ -100,12 +100,14 @@ public class LoginActivity extends AppCompatActivity {
         else ready=true;
 
         if(ready) {
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,null, new Response.Listener<JSONObject>() {
+            String em=(user.getText().toString());
+            String pas=pass.getText().toString();
+            String url2=url+"?email="+em+"&password="+pas;
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url2,null, new Response.Listener<JSONObject>() {
 
                 @Override
                 public void onResponse(JSONObject arg0) {
                     // TODO Auto-generated method stub
-//                    loginSuccess(user.getText().toString());
                     try {
                         JSONArray array=arg0.getJSONArray("users");
                         JSONObject object=array.getJSONObject(0);
@@ -119,11 +121,12 @@ public class LoginActivity extends AppCompatActivity {
                             SharedPreferences.Editor editor = settings.edit();
                             editor.putString("Id", string);
                             editor.commit();
+                            loginSuccess(user.getText().toString());
+
                         }
 
                     }
-                    catch (JSONException e)
-                    {
+                    catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
@@ -135,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(getBaseContext(),"something went wrong, please try again",Toast.LENGTH_LONG).show();
 
                 }
-            }) {
+            }) /*{
 
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
@@ -147,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
                     return parameters;
                 }
 
-            };
+            }*/;
 
             rq.add(request);
         }

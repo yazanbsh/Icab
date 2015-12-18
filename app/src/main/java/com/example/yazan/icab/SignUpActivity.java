@@ -130,12 +130,14 @@ public class SignUpActivity extends AppCompatActivity {
 
         //////
         if(ready) {
+
             StringRequest request = new StringRequest(Request.Method.POST, insertUserUrl, new Response.Listener<String>() {
 
                 @Override
                 public void onResponse(String arg0) {
                     // TODO Auto-generated method stub
-                    signSuccess();
+                    //signSuccess();
+                    Toast.makeText(getBaseContext(),arg0.toString(),Toast.LENGTH_LONG).show();
 
                 }
             }, new Response.ErrorListener() {
