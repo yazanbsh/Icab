@@ -14,8 +14,13 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -92,12 +97,22 @@ public class LoginActivity extends AppCompatActivity {
         else ready=true;
 
         if(ready) {
-            StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,null, new Response.Listener<JSONObject>() {
 
                 @Override
-                public void onResponse(String arg0) {
+                public void onResponse(JSONObject arg0) {
                     // TODO Auto-generated method stub
-                    loginSuccess(user.getText().toString());
+//                    loginSuccess(user.getText().toString());
+                    try {
+                        JSONArray array=arg0.getJSONArray("users");
+                        JSONObject object=array.getJSONObject(0);
+                        String string=object.getString("message");
+
+                    }
+                    catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }, new Response.ErrorListener() {
 
@@ -114,7 +129,7 @@ public class LoginActivity extends AppCompatActivity {
                     // TODO Auto-generated method stub
                     Map<String, String> parameters = new HashMap<String, String>();
 
-                    parameters.put("name", user.getText().toString());
+                    parameters.put("email", user.getText().toString());
                     parameters.put("pass", pass.getText().toString());
                     return parameters;
                 }
