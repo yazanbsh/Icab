@@ -102,7 +102,11 @@ public class MapsActivity extends ActionBarActivity {
                     mytv.setText("Hello there!");
                     loginmethod();
                 }
-                else setUserLocation();
+//                else setUserLocation();
+                else {
+                    Toast.makeText(getBaseContext(),"showing now",Toast.LENGTH_LONG).show();
+                    showCarsMethode();
+                }
 
             }
         });
@@ -383,7 +387,7 @@ public class MapsActivity extends ActionBarActivity {
 
             SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
-            final String id = settings.getString("Id", "27");
+            final String id = settings.getString("Id", "0");
 
             rq = Volley.newRequestQueue(getApplicationContext());
             String url=logouturl+"?id="+id;
@@ -404,12 +408,13 @@ public class MapsActivity extends ActionBarActivity {
 
                         if(status.equals("logged_out_successfuly.")){
                             Toast.makeText(getBaseContext(),"looooooooooooooooogout",Toast.LENGTH_LONG).show();
-//                            isLoged = false;
+                            isLoged = false;
                             SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
                             SharedPreferences.Editor editor = settings.edit();
                             editor.putString("Id", "");
                             editor.putBoolean("Flag", false);
                             editor.commit();
+
                         }
                         else {
                             Toast.makeText(getBaseContext(),"noooo work",Toast.LENGTH_LONG).show();
@@ -485,23 +490,7 @@ public class MapsActivity extends ActionBarActivity {
                 Log.d("test", arg0.toString());
 
             }
-        })/* {
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                // TODO Auto-generated method stub
-                Map<String, String> parameters = new HashMap<String, String>();
-                String s1=""+userLatLng.latitude;
-                String s2=""+userLatLng.longitude;
-                String s3="27";
-
-                parameters.put("Id",s3);
-                parameters.put("geolat", s1);
-                parameters.put("geolong", s2);
-                return parameters;
-            }
-
-        }*/;
+        });
 
         rq.add(request);
     }
@@ -537,6 +526,48 @@ public class MapsActivity extends ActionBarActivity {
         unregisterReceiver(mHandleMessageReceiver);
         GCMRegistrar.onDestroy(this);
         super.onDestroy();
+    }
+
+    public void showCarsMethode(){
+        boolean ready=false;
+        if (!isOnline())
+            Toast.makeText(getBaseContext(), "please check your internet connection", Toast.LENGTH_LONG).show();
+        else ready=true;
+
+        if(ready) {
+
+            SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+            final String id = settings.getString("Id", "0");
+            rq = Volley.newRequestQueue(getApplicationContext());
+            String url=showCarUrl+"?id="+id;
+            JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject jsonObject) {
+                    Toast.makeText(getBaseContext(),jsonObject.toString(),Toast.LENGTH_LONG).show();
+                    try {
+                        JSONArray array=jsonObject.getJSONArray("cars");
+                        for (int i=0;i<array.length();i+=2){
+                            JSONObject object=array.getJSONObject(i);
+                            JSONObject object2=array.getJSONObject(i+1);
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(object.getDouble("geolat"),
+                                    object.getDouble("geolong"))).title(object.getString("driver")+"/n"+object2.getString("officeName")));
+                        }
+                    }
+                    catch (JSONException e){
+                        Toast.makeText(getBaseContext(),"error in show cars",Toast.LENGTH_LONG).show();
+                    }
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+
+                }
+            });
+
+        }
+
     }
 
 
