@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,39 +17,28 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.SharedPreferences;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.io.IOException;
-
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
+import com.google.android.gcm.GCMRegistrar;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 
-import java.util.HashMap;
-import java.util.Map;
-
-
-import com.google.android.gcm.GCMRegistrar;
 import static com.example.yazan.icab.CommonUtilities.DISPLAY_MESSAGE_ACTION;
-import static com.example.yazan.icab.CommonUtilities.SENDER_ID;
 import static com.example.yazan.icab.CommonUtilities.EXTRA_MESSAGE;
-import static com.example.yazan.icab.CommonUtilities.SERVER_URL;
+import static com.example.yazan.icab.CommonUtilities.SENDER_ID;
 import static com.example.yazan.icab.SignUpActivity.PREFS_NAME;
 
 
@@ -59,7 +49,7 @@ public class MapsActivity extends ActionBarActivity {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     double l1, l2;
     boolean isSet=false;
-    boolean isLoged=false;
+//    boolean isLoged=false;
     boolean isNet=false;
     LatLng userLatLng;
 
@@ -73,14 +63,23 @@ public class MapsActivity extends ActionBarActivity {
 
     public static String name;
     public static String id = "0";
+    public static boolean isLoged=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+        name = settings.getString("Name", "user");
+
+        id = settings.getString("Id", "0");
+        isLoged=settings.getBoolean("Flag",false);
+
         startDialog=new Dialog(this,R.style.startdialog);
         startDialog.setContentView(R.layout.startdialog);
+
 
 //        runnable.run();
         if (!isLoged)
@@ -92,11 +91,6 @@ public class MapsActivity extends ActionBarActivity {
         loginmethod();
         ///////
 
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-
-        name = settings.getString("Name", "user");
-
-        id = settings.getString("Id", "0");
 
         FloatingActionButton fab= (FloatingActionButton) findViewById(R.id.fab);
 
@@ -371,6 +365,7 @@ public class MapsActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 logoutMethode();
+                settingdialog.dismiss();
             }
         });
 
@@ -409,7 +404,12 @@ public class MapsActivity extends ActionBarActivity {
 
                         if(status.equals("logged_out_successfuly.")){
                             Toast.makeText(getBaseContext(),"looooooooooooooooogout",Toast.LENGTH_LONG).show();
-                            isLoged = false;
+//                            isLoged = false;
+                            SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                            SharedPreferences.Editor editor = settings.edit();
+                            editor.putString("Id", "");
+                            editor.putBoolean("Flag", false);
+                            editor.commit();
                         }
                         else {
                             Toast.makeText(getBaseContext(),"noooo work",Toast.LENGTH_LONG).show();
@@ -445,53 +445,7 @@ public class MapsActivity extends ActionBarActivity {
             }*/;
 
             rq.add(jOR);
-
-            /*StringRequest request = new StringRequest(Request.Method.POST, logouturl, new Response.Listener<String>() {
-
-                @Override
-                public void onResponse(String arg0) {
-                    // TODO Auto-generated method stub
-
-                    *//*try {
-
-                        JSONArray array1=arg0.getJSONArray("userLogout");
-                        JSONObject object1=array1.getJSONObject(0);
-                        String status = object1.getString("message");
-
-                        if(status.equals("logged_out_successfuly.")){
-                            Toast.makeText(getBaseContext(),"looooooooooooooooogout",Toast.LENGTH_LONG).show();
-                            isLoged = false;
-
-                        }
-
-                    }catch (JSONException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }*//*
-
-                }
-            }, new Response.ErrorListener() {
-
-                @Override
-                public void onErrorResponse(VolleyError arg0) {
-                    // TODO Auto-generated method stub
-
-                }
-            }){
-
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    // TODO Auto-generated method stub
-                    Map<String, String> parameters = new HashMap<String, String>();
-
-                    parameters.put("id", id);
-
-                    return parameters;
-                }
-
-            };
-
-            rq.add(request);*/
+            isLoged=settings.getBoolean("Flag",false);
 
         }
 
@@ -528,7 +482,7 @@ public class MapsActivity extends ActionBarActivity {
             public void onErrorResponse(VolleyError arg0) {
                 // TODO Auto-generated method stub
 //                Toast.makeText(getBaseContext(),"something went wrong, please try again",Toast.LENGTH_LONG).show();
-                Log.d("test",arg0.toString());
+                Log.d("test", arg0.toString());
 
             }
         })/* {

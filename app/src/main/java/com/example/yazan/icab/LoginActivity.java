@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -23,10 +22,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.example.yazan.icab.SignUpActivity.PREFS_NAME;
+import static com.example.yazan.icab.MapsActivity.isLoged;
 
 
 /**
@@ -120,6 +118,7 @@ public class LoginActivity extends AppCompatActivity {
                             SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
                             SharedPreferences.Editor editor = settings.edit();
                             editor.putString("Id", string);
+                            editor.putBoolean("Flag", true);
                             editor.commit();
                             loginSuccess(user.getText().toString());
 
