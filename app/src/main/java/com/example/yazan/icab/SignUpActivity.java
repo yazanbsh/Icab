@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.content.SharedPreferences;
+
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -36,6 +38,8 @@ public class SignUpActivity extends AppCompatActivity {
     String insertUserUrl = "http://www.gradwebsite-domain.usa.cc/signup_user.php";
 
     RequestQueue rq;
+
+    public static final String PREFS_NAME = "Settings";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,7 +163,13 @@ public class SignUpActivity extends AppCompatActivity {
                     parameters.put("email", email.getText().toString());
                     parameters.put("birthday", datenum);
                     parameters.put("phone", phonenum);
-                    parameters.put("pass", pass.getText().toString());
+                    parameters.put("password", pass.getText().toString());
+
+                    SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString("Name", user.getText().toString());
+                    editor.commit();
+
                     return parameters;
                 }
 

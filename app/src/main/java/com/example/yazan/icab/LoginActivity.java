@@ -107,6 +107,9 @@ public class LoginActivity extends AppCompatActivity {
                         JSONArray array=arg0.getJSONArray("users");
                         JSONObject object=array.getJSONObject(0);
                         String string=object.getString("message");
+                        if (string.equals("log_in_failed.")){
+                            Toast.makeText(getBaseContext(),"erooooooooooooooooor",Toast.LENGTH_LONG).show();
+                        }
 
                     }
                     catch (JSONException e)
@@ -130,7 +133,7 @@ public class LoginActivity extends AppCompatActivity {
                     Map<String, String> parameters = new HashMap<String, String>();
 
                     parameters.put("email", user.getText().toString());
-                    parameters.put("pass", pass.getText().toString());
+                    parameters.put("password", pass.getText().toString());
                     return parameters;
                 }
 

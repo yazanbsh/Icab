@@ -1,55 +1,77 @@
 package com.example.yazan.icab;
 
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBarActivity;
-import android.text.InputType;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.SharedPreferences;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
+
+import com.google.android.gcm.GCMRegistrar;
+import static com.example.yazan.icab.CommonUtilities.DISPLAY_MESSAGE_ACTION;
+import static com.example.yazan.icab.CommonUtilities.SENDER_ID;
+import static com.example.yazan.icab.CommonUtilities.EXTRA_MESSAGE;
+import static com.example.yazan.icab.CommonUtilities.SERVER_URL;
+import static com.example.yazan.icab.SignUpActivity.PREFS_NAME;
+
+
 public class MapsActivity extends ActionBarActivity {
+
+    AsyncTask<Void, Void, Void> mRegisterTask;
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     double l1, l2;
     boolean isSet=false;
     boolean isLoged=false;
     boolean isNet=false;
+    LatLng userLatLng;
 
     Dialog startDialog;
 
     String showCarUrl="http://www.gradwebsite-domain.usa.cc/show_cars.php";
+    String logouturl="http://www.gradwebsite-domain.usa.cc/logout_user.php";
+    String userLocationurl="http://www.gradwebsite-domain.usa.cc/user_location.php";
 
+    RequestQueue rq;
+
+    public static String name;
+    public static String id = "0";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +90,12 @@ public class MapsActivity extends ActionBarActivity {
 
         loginmethod();
         ///////
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+        name = settings.getString("Name", "user");
+
+        id = settings.getString("Id", "0");
 
         FloatingActionButton fab= (FloatingActionButton) findViewById(R.id.fab);
 
@@ -90,6 +118,51 @@ public class MapsActivity extends ActionBarActivity {
                 settingmethod();
             }
         });
+
+        GCMRegistrar.checkDevice(this);
+
+        // Make sure the manifest was properly set - comment out this line
+        // while developing the app, then uncomment it when it's ready.
+        GCMRegistrar.checkManifest(this);
+
+        registerReceiver(mHandleMessageReceiver, new IntentFilter(
+                DISPLAY_MESSAGE_ACTION));
+
+        // Get GCM registration id
+        final String regId = GCMRegistrar.getRegistrationId(this);
+        // Check if regid already presents
+        if (regId.equals("")) {
+            // Registration is not present, register now with GCM
+            GCMRegistrar.register(this, SENDER_ID);
+        } else {
+            // Device is already registered on GCM
+            if (GCMRegistrar.isRegisteredOnServer(this)) {
+                // Skips registration.
+                Toast.makeText(getApplicationContext(), "Already registered with GCM", Toast.LENGTH_LONG).show();
+            } else {
+                // Try to register again, but not in the UI thread.
+                // It's also necessary to cancel the thread onDestroy(),
+                // hence the use of AsyncTask instead of a raw thread.
+                final Context context = this;
+                mRegisterTask = new AsyncTask<Void, Void, Void>() {
+
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        // Register on our server
+                        // On server creates a new user
+                        ServerUtilities.register(context, name, id, regId);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void result) {
+                        mRegisterTask = null;
+                    }
+
+                };
+                mRegisterTask.execute(null, null, null);
+            }
+        }
 
 
     }
@@ -137,6 +210,7 @@ public class MapsActivity extends ActionBarActivity {
                         l2 = arg0.getLongitude();*/
                         if (!isSet){
                             mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("U'r here!"));
+                            userLatLng=new LatLng(arg0.getLatitude(),arg0.getLongitude());
                             isSet=true;
                         }
                     }
@@ -290,6 +364,176 @@ public class MapsActivity extends ActionBarActivity {
             }
         });
 
+    }
+
+
+    public void logoutMethode(){
+
+        boolean ready=false;
+        if (!isOnline())
+            Toast.makeText(getBaseContext(), "please check your internet connection", Toast.LENGTH_LONG).show();
+        else ready=true;
+
+        if(ready) {
+
+            SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+            final String id = settings.getString("Id", "0");
+
+            rq = Volley.newRequestQueue(getApplicationContext());
+
+
+            JsonObjectRequest jOR = new JsonObjectRequest(Request.Method.POST, logouturl,null, new Response.Listener<JSONObject>()
+            {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    // TODO Auto-generated method stub
+
+                    try {
+
+                        JSONArray array1=response.getJSONArray("userLogout");
+                        JSONObject object1=array1.getJSONObject(0);
+                        String status = object1.getString("message");
+
+                        if(status.equals("logged_out_successfuly.")){
+
+                            isLoged = false;
+
+                        }
+
+                    }catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError arg0) {
+                    // TODO Auto-generated method stub
+                    Toast.makeText(getBaseContext(),"something went wrong, please try again",Toast.LENGTH_LONG).show();
+
+                }
+            });
+
+            rq.add(jOR);
+
+            StringRequest request = new StringRequest(Request.Method.POST, logouturl, new Response.Listener<String>() {
+
+                @Override
+                public void onResponse(String arg0) {
+                    // TODO Auto-generated method stub
+
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError arg0) {
+                    // TODO Auto-generated method stub
+
+                }
+            }){
+
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    // TODO Auto-generated method stub
+                    Map<String, String> parameters = new HashMap<String, String>();
+
+                    parameters.put("id", id);
+
+                    return parameters;
+                }
+
+            };
+
+            rq.add(request);
+
+        }
+
+    }
+
+
+    public void setUserLocation(){
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, userLocationurl,null, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject arg0) {
+                // TODO Auto-generated method stub
+//                    loginSuccess(user.getText().toString());
+                try {
+                    JSONArray array=arg0.getJSONArray("users");
+                    JSONObject object=array.getJSONObject(0);
+                    String string=object.getString("message");
+
+                }
+                catch (JSONException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError arg0) {
+                // TODO Auto-generated method stub
+                Toast.makeText(getBaseContext(),"something went wrong, please try again",Toast.LENGTH_LONG).show();
+
+            }
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                // TODO Auto-generated method stub
+                Map<String, String> parameters = new HashMap<String, String>();
+                String s1=""+userLatLng.latitude;
+                String s2=""+userLatLng.longitude;
+                String s3=""+userLatLng.longitude;
+
+                parameters.put("id",s3);
+                parameters.put("geolat", s1);
+                parameters.put("geolong", s2);
+                return parameters;
+            }
+
+        };
+
+        rq.add(request);
+    }
+
+
+    /**
+     * Receiving push messages
+     * */
+    private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String newMessage = intent.getExtras().getString(EXTRA_MESSAGE);
+            // Waking up mobile if it is sleeping
+            WakeLocker.acquire(getApplicationContext());
+
+            /**
+             * Take appropriate action on this message
+             * depending upon your app requirement
+             * For now i am just displaying it on the screen
+             * */
+            Toast.makeText(getApplicationContext(), "New Message: " + newMessage, Toast.LENGTH_LONG).show();
+
+            // Releasing wake lock
+            WakeLocker.release();
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        if (mRegisterTask != null) {
+            mRegisterTask.cancel(true);
+        }
+        unregisterReceiver(mHandleMessageReceiver);
+        GCMRegistrar.onDestroy(this);
+        super.onDestroy();
     }
 
 
