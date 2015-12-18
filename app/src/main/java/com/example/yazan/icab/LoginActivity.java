@@ -2,6 +2,7 @@ package com.example.yazan.icab;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -15,7 +16,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -25,6 +25,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.example.yazan.icab.SignUpActivity.PREFS_NAME;
+
 
 /**
  * Created by Yazan on 12/16/2015.
@@ -107,8 +110,15 @@ public class LoginActivity extends AppCompatActivity {
                         JSONArray array=arg0.getJSONArray("users");
                         JSONObject object=array.getJSONObject(0);
                         String string=object.getString("message");
+//                        Toast.makeText(getBaseContext(),arg0.toString(),Toast.LENGTH_LONG).show();
                         if (string.equals("log_in_failed.")){
                             Toast.makeText(getBaseContext(),"erooooooooooooooooor",Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                            SharedPreferences.Editor editor = settings.edit();
+                            editor.putString("Id", string);
+                            editor.commit();
                         }
 
                     }

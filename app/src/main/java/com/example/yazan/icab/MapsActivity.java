@@ -364,6 +364,14 @@ public class MapsActivity extends ActionBarActivity {
             }
         });
 
+        Button logoutButton= (Button) settingdialog.findViewById(R.id.logoutbtn);
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logoutMethode();
+            }
+        });
+
     }
 
 
@@ -378,7 +386,7 @@ public class MapsActivity extends ActionBarActivity {
 
             SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
-            final String id = settings.getString("Id", "0");
+            final String id = settings.getString("Id", "27");
 
             rq = Volley.newRequestQueue(getApplicationContext());
 
@@ -395,11 +403,14 @@ public class MapsActivity extends ActionBarActivity {
                         JSONArray array1=response.getJSONArray("userLogout");
                         JSONObject object1=array1.getJSONObject(0);
                         String status = object1.getString("message");
+                        Toast.makeText(getBaseContext(),response.toString(),Toast.LENGTH_LONG).show();
 
                         if(status.equals("logged_out_successfuly.")){
-
+                            Toast.makeText(getBaseContext(),"looooooooooooooooogout",Toast.LENGTH_LONG).show();
                             isLoged = false;
-
+                        }
+                        else {
+                            Toast.makeText(getBaseContext(),"noooo work",Toast.LENGTH_LONG).show();
                         }
 
                     }catch (JSONException e) {
@@ -417,15 +428,44 @@ public class MapsActivity extends ActionBarActivity {
                     Toast.makeText(getBaseContext(),"something went wrong, please try again",Toast.LENGTH_LONG).show();
 
                 }
-            });
+            }){
+
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    // TODO Auto-generated method stub
+                    Map<String, String> parameters = new HashMap<String, String>();
+
+                    parameters.put("id","27");
+
+                    return parameters;
+                }
+
+            };
 
             rq.add(jOR);
 
-            StringRequest request = new StringRequest(Request.Method.POST, logouturl, new Response.Listener<String>() {
+            /*StringRequest request = new StringRequest(Request.Method.POST, logouturl, new Response.Listener<String>() {
 
                 @Override
                 public void onResponse(String arg0) {
                     // TODO Auto-generated method stub
+
+                    *//*try {
+
+                        JSONArray array1=arg0.getJSONArray("userLogout");
+                        JSONObject object1=array1.getJSONObject(0);
+                        String status = object1.getString("message");
+
+                        if(status.equals("logged_out_successfuly.")){
+                            Toast.makeText(getBaseContext(),"looooooooooooooooogout",Toast.LENGTH_LONG).show();
+                            isLoged = false;
+
+                        }
+
+                    }catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }*//*
 
                 }
             }, new Response.ErrorListener() {
@@ -449,7 +489,7 @@ public class MapsActivity extends ActionBarActivity {
 
             };
 
-            rq.add(request);
+            rq.add(request);*/
 
         }
 
@@ -490,9 +530,9 @@ public class MapsActivity extends ActionBarActivity {
                 Map<String, String> parameters = new HashMap<String, String>();
                 String s1=""+userLatLng.latitude;
                 String s2=""+userLatLng.longitude;
-                String s3=""+userLatLng.longitude;
+                String s3=id;
 
-                parameters.put("id",s3);
+                parameters.put("Id",s3);
                 parameters.put("geolat", s1);
                 parameters.put("geolong", s2);
                 return parameters;
