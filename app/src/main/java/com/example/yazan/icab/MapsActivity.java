@@ -61,6 +61,7 @@ public class MapsActivity extends ActionBarActivity {
     String showCarUrl="http://www.gradwebsite-domain.usa.cc/show_cars.php";
     String logouturl="http://www.gradwebsite-domain.usa.cc/logout_user.php";
     String userLocationurl="http://www.gradwebsite-domain.usa.cc/user_location.php";
+    String assignCarUrl="http://gradwebsite-domain.usa.cc/assign.php";
 
     RequestQueue rq;
 
@@ -108,8 +109,10 @@ public class MapsActivity extends ActionBarActivity {
 
                 else {
                     setUserLocation();
-                    Toast.makeText(getBaseContext(),"showing now",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(),"showing now",Toast.LENGTH_SHORT).show();
                     showCarsMethode();
+                    assignCarMethode();
+
                 }
 
             }
@@ -237,15 +240,10 @@ public class MapsActivity extends ActionBarActivity {
 
     }
 
-   /* public void fab_Onclick(View view) {
-        TextView mytv= (TextView) findViewById(R.id.tvbar);
-        mytv.setText("Hello there!");
-    }
-*/
 
 
-
-    /*Runnable runnable = new Runnable() {
+    /**
+    Runnable runnable = new Runnable() {
         final Handler handler = new Handler();
 
         @Override
@@ -280,7 +278,8 @@ public class MapsActivity extends ActionBarActivity {
             }
         }
 
-    };*/
+    };
+    */
 //    handler.postDelayed(runnable, 1000);
 
 
@@ -620,6 +619,38 @@ public class MapsActivity extends ActionBarActivity {
 
     }
 
+    public void assignCarMethode() {
+        boolean ready = false;
+        if (!isOnline())
+            Toast.makeText(getBaseContext(), "please check your internet connection", Toast.LENGTH_LONG).show();
+        else ready = true;
+
+
+        if (ready) {
+
+            SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+            final String id = settings.getString("Id", "0");
+            rq = Volley.newRequestQueue(getApplicationContext());
+            String url=assignCarUrl+"?userId="+id+"&carId=1500"+"&fromGeolat="+userLatLng.latitude+
+                    "&fromGeolong="+userLatLng.longitude+"&toGeolat="+"&toGeolong=";
+
+            JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject jsonObject) {
+                    Toast.makeText(getBaseContext(),jsonObject.toString(),Toast.LENGTH_LONG).show();
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    Toast.makeText(getBaseContext(),"error in assign",Toast.LENGTH_LONG).show();
+
+                }
+            });
+            rq.add(request);
+        }
+    }
 
 
 
