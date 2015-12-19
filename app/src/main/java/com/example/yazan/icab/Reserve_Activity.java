@@ -57,6 +57,12 @@ public class Reserve_Activity extends AppCompatActivity {
         nowbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                done2();
+            }
+        });
+        laterbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 done();
             }
         });
@@ -187,16 +193,23 @@ public class Reserve_Activity extends AppCompatActivity {
         else{
             timenum=timestrig;
         }
-        all=timenum+":00 "+datenum;
+        all=datenum+" "+timenum+":00";
 //        Toast.makeText(getBaseContext(),timenum,Toast.LENGTH_LONG).show();
 //        Toast.makeText(getBaseContext(),all,Toast.LENGTH_LONG).show();
 
 
-        returnIntent.putExtra("all",all);
+            returnIntent.putExtra("flag","later");
+            returnIntent.putExtra("all",all);
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
         }
     }
 
+    public void done2(){
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("flag","now");
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
 
+    }
 }

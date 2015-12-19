@@ -352,9 +352,17 @@ public class MapsActivity extends ActionBarActivity {
             }
         }
         else if (requestCode==2){
-            String all=data.getStringExtra("all");
-            reservetime=all;
-            reserveationmethode();
+            String flag=data.getStringExtra("flag");
+            if (flag.equals("now")){
+                Toast.makeText(getBaseContext(),"do now",Toast.LENGTH_SHORT).show();
+                assignCarMethode();
+            }
+            else if (flag.equals("later")){
+                Toast.makeText(getBaseContext(),"do later",Toast.LENGTH_SHORT).show();
+                String all=data.getStringExtra("all");
+                reservetime=all;
+                reserveationmethode();
+            }
 
         }
     }//onActivityResult
@@ -677,8 +685,9 @@ public class MapsActivity extends ActionBarActivity {
             rq = Volley.newRequestQueue(getApplicationContext());
             String url=reserveUrl+"?userId="+id+"&fromGeolat="+userLatLng.latitude+
                     "&fromGeolong="+userLatLng.longitude+"&time="+reservetime+"&toGeolat="+"&toGeolong=";
+            String url2="http://www.gradwebsite-domain.usa.cc/reservation.php?userId=27&fromGeolat=32&fromGeolong=32&time=2022-7-28 06:43:00&toGeolat&toGeolong";
 
-            JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, url2, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject jsonObject) {
                     Toast.makeText(getBaseContext(),jsonObject.toString(),Toast.LENGTH_LONG).show();
@@ -688,6 +697,8 @@ public class MapsActivity extends ActionBarActivity {
                 @Override
                 public void onErrorResponse(VolleyError volleyError) {
                     Toast.makeText(getBaseContext(),"error in reserve",Toast.LENGTH_LONG).show();
+                    Log.d("testreserve", volleyError.toString());
+                    volleyError.printStackTrace();
 
                 }
             });
