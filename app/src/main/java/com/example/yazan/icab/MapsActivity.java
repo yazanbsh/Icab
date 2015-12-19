@@ -50,6 +50,7 @@ public class MapsActivity extends ActionBarActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     double l1, l2;
+    boolean tst=true;
     boolean isSet=false;
 //    boolean isLoged=false;
     boolean isNet=false;
@@ -104,8 +105,9 @@ public class MapsActivity extends ActionBarActivity {
                     mytv.setText("Hello there!");
                     loginmethod();
                 }
-//                else setUserLocation();
+
                 else {
+                    setUserLocation();
                     Toast.makeText(getBaseContext(),"showing now",Toast.LENGTH_LONG).show();
                     showCarsMethode();
                 }
@@ -374,6 +376,11 @@ public class MapsActivity extends ActionBarActivity {
             public void onClick(View v) {
                 logoutMethode();
                 settingdialog.dismiss();
+                if (tst){
+                    tst=false;
+                }
+                else isLoged=false;
+
             }
         });
 
