@@ -488,9 +488,14 @@ public class MapsActivity extends ActionBarActivity {
     public void setUserLocation(){
         rq = Volley.newRequestQueue(getApplicationContext());
 
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+        final String id = settings.getString("Id", "0");
+
         String s1=""+userLatLng.latitude;
         String s2=""+userLatLng.longitude;
-        String s3="27";
+        String s3=id;
+
         String url=userLocationurl+"?id="+s3+"&geolat="+s1+"&geolong="+s2;
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,null, new Response.Listener<JSONObject>() {
 
