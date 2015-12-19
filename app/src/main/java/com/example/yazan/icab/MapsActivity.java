@@ -27,7 +27,9 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -164,7 +166,6 @@ public class MapsActivity extends ActionBarActivity {
             }
         }
 
-
     }
 
 
@@ -209,7 +210,10 @@ public class MapsActivity extends ActionBarActivity {
                         /*l1 = arg0.getLatitude();
                         l2 = arg0.getLongitude();*/
                         if (!isSet){
-                            mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("U'r here!"));
+
+                            MarkerOptions marker=new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("U'r here!").snippet("U'r here!");
+                            marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.user));
+                            mMap.addMarker(marker);
                             userLatLng=new LatLng(arg0.getLatitude(),arg0.getLongitude());
                             isSet=true;
                         }
@@ -534,6 +538,7 @@ public class MapsActivity extends ActionBarActivity {
             Toast.makeText(getBaseContext(), "please check your internet connection", Toast.LENGTH_LONG).show();
         else ready=true;
 
+
         if(ready) {
 
             SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
@@ -544,14 +549,51 @@ public class MapsActivity extends ActionBarActivity {
             JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject jsonObject) {
-                    Toast.makeText(getBaseContext(),jsonObject.toString(),Toast.LENGTH_LONG).show();
                     try {
                         JSONArray array=jsonObject.getJSONArray("cars");
                         for (int i=0;i<array.length();i+=2){
                             JSONObject object=array.getJSONObject(i);
                             JSONObject object2=array.getJSONObject(i+1);
-                            mMap.addMarker(new MarkerOptions().position(new LatLng(object.getDouble("geolat"),
-                                    object.getDouble("geolong"))).title(object.getString("driver")+"/n"+object2.getString("officeName")));
+
+                            mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+                                // Use default InfoWindow frame
+                                @Override
+                                public View getInfoWindow(Marker arg0) {
+                                    return null;
+                                }
+
+                                // Defines the contents of the InfoWindow
+                                @Override
+                                public View getInfoContents(Marker arg0) {
+
+                                    // Getting view from the layout file info_window_layout
+                                    View v = getLayoutInflater().inflate(R.layout.info_window, null);
+                                    TextView tvDrv = (TextView) v.findViewById(R.id.tv_driver);
+//                                    TextView tvOfc = (TextView) v.findViewById(R.id.tv_office);
+//                                    TextView tvPhn= (TextView) v.findViewById(R.id.tv_phone);
+                                    tvDrv.setText(arg0.getSnippet());
+
+                                    // Returning the view containing InfoWindow contents
+                                    return v;
+
+                                }
+                            });
+
+                            String snip=object.getString("driver") + "\n" + object2.getString("officeName")+"\n"+object.getString("phone");
+
+
+
+                            MarkerOptions markerOptions=new MarkerOptions().position(new LatLng(object.getDouble("geolat"),
+                                    object.getDouble("geolong"))).snippet(snip);
+
+                            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.car));
+
+                            Marker marker = mMap.addMarker(markerOptions);
+
+                            // Showing InfoWindow on the GoogleMap
+//                            marker.showInfoWindow();
+//                            mMap.addMarker(marker);
                         }
                     }
                     catch (JSONException e){
@@ -570,6 +612,8 @@ public class MapsActivity extends ActionBarActivity {
         }
 
     }
+
+
 
 
 }
