@@ -136,8 +136,8 @@ public class SignUpActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(String arg0) {
                     // TODO Auto-generated method stub
-                    //signSuccess();
-                    Toast.makeText(getBaseContext(),arg0.toString(),Toast.LENGTH_LONG).show();
+                    signSuccess();
+//                    Toast.makeText(getBaseContext(),arg0.toString(),Toast.LENGTH_LONG).show();
 
                 }
             }, new Response.ErrorListener() {

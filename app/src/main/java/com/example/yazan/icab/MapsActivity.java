@@ -453,10 +453,10 @@ public class MapsActivity extends ActionBarActivity {
                         JSONArray array1=response.getJSONArray("userLogout");
                         JSONObject object1=array1.getJSONObject(0);
                         String status = object1.getString("message");
-                        Toast.makeText(getBaseContext(),response.toString(),Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getBaseContext(),response.toString(),Toast.LENGTH_LONG).show();
 
                         if(status.equals("logged_out_successfuly.")){
-                            Toast.makeText(getBaseContext(),"looooooooooooooooogout",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getBaseContext(),"logged out successfully",Toast.LENGTH_LONG).show();
                             isLoged = false;
                             SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
                             SharedPreferences.Editor editor = settings.edit();
@@ -466,7 +466,7 @@ public class MapsActivity extends ActionBarActivity {
 
                         }
                         else {
-                            Toast.makeText(getBaseContext(),"noooo work",Toast.LENGTH_LONG).show();
+//                            Toast.makeText(getBaseContext(),"noooo work",Toast.LENGTH_LONG).show();
                         }
 
                     }catch (JSONException e) {
@@ -682,7 +682,7 @@ public class MapsActivity extends ActionBarActivity {
             JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject jsonObject) {
-                    Toast.makeText(getBaseContext(),jsonObject.toString(),Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getBaseContext(),jsonObject.toString(),Toast.LENGTH_LONG).show();
 
                 }
             }, new Response.ErrorListener() {
@@ -716,7 +716,22 @@ public class MapsActivity extends ActionBarActivity {
             JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, url2, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject jsonObject) {
-                    Toast.makeText(getBaseContext(),jsonObject.toString(),Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getBaseContext(),jsonObject.toString(),Toast.LENGTH_LONG).show();
+                    try {
+
+                        JSONArray array1=jsonObject.getJSONArray("userLogout");
+                        JSONObject object1=array1.getJSONObject(0);
+                        String status = object1.getString("message");
+//                        Toast.makeText(getBaseContext(),response.toString(),Toast.LENGTH_LONG).show();
+
+                        if(status.equals("reserved_successfully.")){
+                            Toast.makeText(getBaseContext(),"reserved successfully",Toast.LENGTH_LONG).show();
+
+                        }
+                    }catch (JSONException e){
+
+                    }
+
 
                 }
             }, new Response.ErrorListener() {
