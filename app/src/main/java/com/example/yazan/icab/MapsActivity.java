@@ -113,13 +113,8 @@ public class MapsActivity extends ActionBarActivity {
                 }
 
                 else {
-                    /*setUserLocation();
-                    Toast.makeText(getBaseContext(),"showing now",Toast.LENGTH_SHORT).show();
-
-                    assignCarMethode();*/
-                    /*Intent intent = new Intent(MapsActivity.this,Reserve_Activity.class);
-                    startActivityForResult(intent,2);*/
-                    showCarsMethode();
+                    Intent intent = new Intent(MapsActivity.this,Reserve_Activity.class);
+                    startActivityForResult(intent,2);
 
                 }
 
