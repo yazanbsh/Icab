@@ -37,7 +37,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import static java.util.concurrent.TimeUnit.*;
 import static com.example.yazan.icab.CommonUtilities.DISPLAY_MESSAGE_ACTION;
 import static com.example.yazan.icab.CommonUtilities.EXTRA_MESSAGE;
 import static com.example.yazan.icab.CommonUtilities.SENDER_ID;
@@ -92,11 +95,11 @@ public class MapsActivity extends ActionBarActivity {
         {
             TextView mytv= (TextView) findViewById(R.id.tvbar);
             mytv.setText("please login or sign up to use the app!");
+            loginmethod();
         }
 
-        loginmethod();
         ///////
-
+        if (isLoged)new MyTask().execute();
 
         FloatingActionButton fab= (FloatingActionButton) findViewById(R.id.fab);
 
@@ -226,6 +229,7 @@ public class MapsActivity extends ActionBarActivity {
                             mMap.addMarker(marker);
                             userLatLng=new LatLng(arg0.getLatitude(),arg0.getLongitude());
                             isSet=true;
+                            if (isLoged)new MyTask2().execute();
                         }
                     }
                 });
@@ -286,6 +290,25 @@ public class MapsActivity extends ActionBarActivity {
     };
     */
 //    handler.postDelayed(runnable, 1000);
+    private class MyTask extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            showCarsMethode();
+            return null;
+        }
+    }
+
+    private class MyTask2 extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            setUserLocation();
+            return null;
+        }
+    }
+
+
 
 
     public boolean isOnline() {
@@ -346,6 +369,8 @@ public class MapsActivity extends ActionBarActivity {
                 isLoged=true;
                 TextView textView=(TextView) findViewById(R.id.tvbar);
                 textView.setText("hello "+result);
+                new MyTask().execute();
+                new MyTask2().execute();
                 startDialog.dismiss();
             }
             if (resultCode == Activity.RESULT_CANCELED) {
